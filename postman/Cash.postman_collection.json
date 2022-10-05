@@ -1,0 +1,241 @@
+{
+	"info": {
+		"_postman_id": "2c310d15-7bcf-4068-acd4-6247c249027f",
+		"name": "Cash",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "accept-request",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"requester\": \"Alice\",\n\t\"currency\": \"GBP\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/cash/accept-request",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"cash",
+						"accept-request"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "decline-request",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"requester\": \"Alice\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/cash/decline-request",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"cash",
+						"decline-request"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"cashOwner\": \"Alice\",\n\t\"reason\": \"Postman example cash delete\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/cash/delete",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"cash",
+						"delete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "unlock",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"cashOwner\": \"Alice\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/cash/unlock",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"cash",
+						"unlock"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "filters",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n\t\"filterModel\": {\n\t\t\"owner\": {\n\t\t\t\"filterType\": \"text\",\n\t\t\t\"type\": \"equals\",\n\t\t\t\"filter\": \"Google\"\n\t\t}\n\t}\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/cash/filters",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"cash",
+						"filters"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "cash/{id}",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8083/cash/4ca1bd010eba63bb5947186d09c453cfa0b68f452b0123042d873dbfb799c745",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"cash",
+						"4ca1bd010eba63bb5947186d09c453cfa0b68f452b0123042d873dbfb799c745"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "requests/filters",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n\t\"filterModel\": {\n\t\t\"requester\": {\n\t\t\t\"filterType\": \"text\",\n\t\t\t\"type\": \"equals\",\n\t\t\t\"filter\": \"Google\"\n\t\t}\n\t}\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/cash/requests/filters",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"cash",
+						"requests",
+						"filters"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

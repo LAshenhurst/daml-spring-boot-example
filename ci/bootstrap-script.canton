@@ -1,0 +1,16 @@
+import better.files._
+
+// where we expect to find the dar file when running Canton through Docker
+val appDar = File(sys.props.get("../app").getOrElse("../app")) / "daml-spring-boot-example.dar"
+
+// participants and domain specified in the conf file
+participant1.domains.connect_local(mydomain)
+participant2.domains.connect_local(mydomain)
+
+// upload dar file to participants
+participants.all.dars.upload(appDar.pathAsString)
+
+// enable parties, first is unique identifier, second is diplay name
+val alice = participant1.parties.enable(name = "Alice", displayName = Some("Alice"))
+val nasdaq = participant1.parties.enable(name = "NASDAQ", displayName = Some("NASDAQ"))
+val google = participant1.parties.enable(name = "Google", displayName = Some("Google"))

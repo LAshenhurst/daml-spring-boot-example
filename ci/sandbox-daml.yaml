@@ -1,0 +1,15 @@
+sdk-version: 2.2.0
+name: daml-spring-boot-example
+source: /home/daml/templates
+init-script: Test.Test:createOffers
+sandbox-options: ["-c", "/ci/sandbox.conf"]
+start-navigator: false
+parties:
+  - NASDAQ
+  - Alice
+  - Google
+version: 1.0.0
+dependencies:
+  - daml-prim
+  - daml-stdlib
+  - daml-script

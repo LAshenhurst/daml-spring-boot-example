@@ -1,0 +1,166 @@
+module Main.Assets where
+
+import Main.Utils
+
+import DA.Optional
+
+template CashRequest
+ with
+  custodian: Party
+  requester: Party
+  amount:    Decimal
+  currency:  Text
+ where
+  signatory requester
+  observer custodian
+
+  key (requester, currency): (Party, Text)
+  maintainer key._1
+
+  choice CreateCash: ContractId Cash
+   with timestamp: Int
+   controller custodian 
+   do 
+    let uniqueIdentifier = createUniqueIdentifier [(partyToText custodian), (partyToText requester), currency, (show AVAI)]
+    existingCashCid <- lookupByKey @Cash (custodian, uniqueIdentifier)
+    case existingCashCid of
+     None -> do create Cash with custodian; owner = requester; amount; currency; latestUpdateTimestamp = timestamp; identifier = uniqueIdentifier; state = AVAI
+     Some cashCid -> do
+      cash <- fetch cashCid
+      archive cashCid
+      create cash with amount = cash.amount + amount; latestUpdateTimestamp = timestamp
+  
+  choice RejectCashRequest: ()
+   controller custodian
+   do return ()
+
+template Cash
+  with
+    custodian: Party
+    owner:     Party
+    identifier:Text
+    amount:    Decimal
+    state:     AssetState
+    currency:  Text
+    latestUpdateTimestamp: Int
+  where
+    signatory custodian
+    observer owner
+
+    let identifier = createUniqueIdentifier [(partyToText custodian), (partyToText owner), currency, (show state)]
+
+    key (custodian, identifier): (Party, Text)
+    maintainer key._1
+
+    choice ChangeCashState: ContractId Cash
+     with timestamp: Int; changeAmount: Decimal; newState: AssetState
+     controller custodian
+     do
+      assertMsg "New state must not be the same as current state" (state /= newState)
+      assertMsg "Amount in the old state must be more than or equal to the change amount" (amount >= changeAmount)
+      create this with amount = amount - changeAmount; latestUpdateTimestamp = timestamp
+      let newStateIdentifier = createUniqueIdentifier [(partyToText custodian), (partyToText owner), currency, (show newState)]
+      existingNewStateCid <- lookupByKey @Cash (custodian, newStateIdentifier)
+      case existingNewStateCid of
+       None -> do create Cash with custodian; owner; state = newState; identifier = newStateIdentifier; amount = changeAmount; currency; latestUpdateTimestamp = timestamp
+       Some existingCid -> do
+        existingCash <- fetch existingCid
+        archive existingCid
+        create existingCash with amount = existingCash.amount + changeAmount; latestUpdateTimestamp = timestamp
+
+template ShareRequest
+ with
+  custodian: Party
+  requester: Party
+  amount:    Decimal
+ where
+  signatory requester
+  observer custodian
+
+  key requester: Party
+  maintainer key
+
+  choice CreateShares: ContractId Shares
+   with timestamp: Int
+   controller custodian
+   do
+    let uniqueIdentifier = createUniqueIdentifier [(partyToText custodian), (partyToText requester), (partyToText requester), (show AVAI)]
+    existingShareCid <- lookupByKey @Shares (custodian, uniqueIdentifier)
+    case existingShareCid of
+     None -> do create Shares with custodian; corp = partyToText requester; identifier = uniqueIdentifier; owner = requester; amount; latestUpdateTimestamp = timestamp; state = AVAI
+     Some shareCid -> do
+      shares <- fetch shareCid
+      archive shareCid
+      create shares with amount = shares.amount + amount; latestUpdateTimestamp = timestamp
+  
+  choice RejectShareRequest: ()
+   controller custodian
+   do return ()
+
+template Shares
+ with
+  custodian: Party
+  corp: Text
+  identifier : Text
+  owner: Party
+  amount: Decimal
+  state: AssetState
+  latestUpdateTimestamp: Int
+ where
+  signatory custodian
+  observer owner
+
+  key (custodian, identifier): (Party, Text)
+  maintainer key._1
+
+  choice ChangeShareState: ContractId Shares
+   with timestamp: Int; changeAmount: Decimal; newState: AssetState
+   controller custodian
+   do
+    assertMsg "New state must not be the same as the current state" (state /= newState)
+    assertMsg "Amount in the old state must be more than or equal to the change amount" (amount >= changeAmount)
+    create this with amount = amount - changeAmount; latestUpdateTimestamp = timestamp
+    let newStateIdentifier = createUniqueIdentifier [(partyToText custodian), (partyToText owner), corp, (show newState)]
+    existingNewStateCid <- lookupByKey @Shares (custodian, newStateIdentifier)
+    case existingNewStateCid of
+     None -> do create Shares with custodian; owner; identifier = newStateIdentifier; corp; amount = changeAmount; state = newState; latestUpdateTimestamp = timestamp
+     Some existingCid -> do
+      existingShares <- fetch existingCid
+      archive existingCid
+      create existingShares with amount = existingShares.amount + changeAmount; latestUpdateTimestamp = timestamp
+
+transferShares(sharesId: Text, amount: Decimal, custodian: Party, newOwner: Party, timestamp: Int) = do
+ sharesCid <- lookupByKey @Shares (custodian, sharesId)
+ assertMsg "Locked Shares not found" (isSome sharesCid)
+ lockedShares <- fetch (fromSome sharesCid)
+ assertMsg "Shares provided are not locked" (lockedShares.state == LOCKED)
+
+ archive (fromSome sharesCid)
+ create lockedShares with amount = lockedShares.amount - amount; latestUpdateTimestamp = timestamp
+
+ let newOwnerExistingSharesId = createUniqueIdentifier [(partyToText custodian), (partyToText newOwner), lockedShares.corp, (show AVAI)]
+ newOwnerExistingSharesCid <- lookupByKey @Shares (custodian, newOwnerExistingSharesId)
+ case newOwnerExistingSharesCid of
+  None -> do create lockedShares with owner = newOwner; identifier = newOwnerExistingSharesId; amount; state = AVAI; latestUpdateTimestamp = timestamp
+  Some existingSharesCid -> do
+   existingShares <- fetch existingSharesCid
+   archive existingSharesCid
+   create existingShares with amount = existingShares.amount + amount; latestUpdateTimestamp = timestamp
+
+transferCash(cashId: Text, amount: Decimal, custodian: Party, newOwner: Party, timestamp: Int) = do
+ cashCid <- lookupByKey @Cash (custodian, cashId)
+ assertMsg "Locked Cash not found" (isSome cashCid)
+ lockedCash <- fetch (fromSome cashCid)
+ assertMsg "Cash provided is not locked" (lockedCash.state == LOCKED)
+
+ archive (fromSome cashCid)
+ create lockedCash with amount = lockedCash.amount - amount; latestUpdateTimestamp = timestamp
+
+ let newOwnerExistingCashId = createUniqueIdentifier [(partyToText custodian), (partyToText newOwner), lockedCash.currency, (show AVAI)]
+ newOwnerExistingCashCid <- lookupByKey @Cash (custodian, newOwnerExistingCashId)
+ case newOwnerExistingCashCid of
+  None -> do create lockedCash with owner = newOwner; identifier = newOwnerExistingCashId; amount; state = AVAI; latestUpdateTimestamp = timestamp
+  Some existingCashCid -> do
+   existingCash <- fetch existingCashCid
+   archive existingCashCid
+   create existingCash with amount = existingCash.amount + amount; latestUpdateTimestamp = timestamp

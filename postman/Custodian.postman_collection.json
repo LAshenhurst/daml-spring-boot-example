@@ -1,0 +1,133 @@
+{
+	"info": {
+		"_postman_id": "d5b8361f-d588-4c86-a338-1df2286f8486",
+		"name": "Custodian",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "create-trader",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"trader\": \"Alice\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/custodian/create-trader",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"custodian",
+						"create-trader"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create-custodian",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8083/custodian",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"custodian"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create-corporation",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"corporation\": \"Google\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/custodian/create-corporation",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"custodian",
+						"create-corporation"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "match",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"buyOfferIdentifier\": \"32c07d8def3995f2a740b025387476b5d2776335b7185b3dfdfb5e987f9f2554\",\n\t\"sellOfferIdentifier\": \"d3265b7e00d7c799c4920fe51566f79ab7a0653a95bacd071fe2be7458f5da64\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/custodian/match",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"custodian",
+						"match"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

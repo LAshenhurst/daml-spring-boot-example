@@ -1,0 +1,60 @@
+module Main.Exchange where
+
+template SellOffer
+ with
+  custodian:     Party
+  amount:        Decimal
+  corp:          Text
+  id:            Text
+  seller:        Party
+  pricePerShare: Decimal
+  currency:      Text
+  latestUpdateTimestamp: Int
+ where
+  signatory custodian
+  observer seller
+
+  key (custodian, id): (Party, Text)
+  maintainer key._1
+
+  choice CancelSellOffer: ()
+   controller seller
+   do return ()
+
+template BuyOffer
+ with
+  custodian:     Party
+  buyer:         Party
+  corp:          Text
+  id:            Text
+  pricePerShare: Decimal
+  amount:        Decimal
+  currency:      Text
+  latestUpdateTimestamp: Int
+ where
+  signatory custodian
+  observer buyer
+
+  key (custodian, id): (Party, Text)
+  maintainer key._1
+
+  choice CancelBuyOffer: ()
+   controller buyer
+   do return ()
+
+updateOffers(buyOfferCid: ContractId BuyOffer, sellOfferCid: ContractId SellOffer, sharesSold: Decimal, timestamp: Int) = do
+ buyOffer <- fetch buyOfferCid
+ if (buyOffer.amount > sharesSold)
+ then do
+  archive buyOfferCid
+  create buyOffer with amount = buyOffer.amount - sharesSold; latestUpdateTimestamp = timestamp
+  return ()
+ else do archive buyOfferCid
+
+ sellOffer <- fetch sellOfferCid
+ if (sellOffer.amount > sharesSold)
+ then do
+  archive sellOfferCid
+  create sellOffer with amount = sellOffer.amount - sharesSold; latestUpdateTimestamp = timestamp
+  return ()
+ else do archive sellOfferCid

@@ -1,0 +1,13 @@
+sdk-version: 2.2.0
+name: daml-spring-boot-example
+source: daml
+init-script: Test.Test:createOffers
+parties:
+  - NASDAQ
+  - Alice
+  - Google
+version: 1.0.0
+dependencies:
+  - daml-prim
+  - daml-stdlib
+  - daml-script

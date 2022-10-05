@@ -1,0 +1,148 @@
+module Main.Entities where
+
+import Main.Utils
+import Main.Assets
+import Main.Exchange
+
+import DA.Optional
+
+template Custodian
+ with custodian: Party
+ where
+  signatory custodian
+
+  key custodian: Party
+  maintainer key
+
+  nonconsuming choice RegisterCorporation: ContractId Corporation
+   with corporation: Party
+   controller custodian
+   do create Corporation with custodian; corporation
+  
+  nonconsuming choice RegisterTrader: ContractId Trader
+   with trader: Party
+   controller custodian
+   do create Trader with custodian; trader
+  
+  nonconsuming choice Match: ()
+    with sellId: Text; buyId: Text; timestamp: Int
+    controller custodian
+    do
+     sellOfferCid <- lookupByKey @SellOffer (custodian, sellId)
+     assertMsg "SellOffer not found" (isSome sellOfferCid)
+     buyOfferCid <- lookupByKey @BuyOffer (custodian, buyId)
+     assertMsg "BuyOffer not found" (isSome buyOfferCid)
+
+     sellOffer <- fetch (fromSome sellOfferCid)
+     buyOffer <- fetch (fromSome buyOfferCid)
+     assertMsg "Cannot match, offers do not refer to the same corporation" (buyOffer.corp == sellOffer.corp)
+     assertMsg "Cannot match, seller and buyer are the same" (buyOffer.buyer /= sellOffer.seller)
+     assertMsg "Cannot match, buy price is lower than sell price." (buyOffer.pricePerShare >= sellOffer.pricePerShare)
+     
+     let totalBuyPrice = buyOffer.pricePerShare * buyOffer.amount
+     let sellerSharesId = createUniqueIdentifier [(partyToText custodian), (partyToText sellOffer.seller), sellOffer.corp, (show LOCKED)]
+     let buyerCashId = createUniqueIdentifier [(partyToText custodian), (partyToText buyOffer.buyer), sellOffer.currency, (show LOCKED)]
+
+     transferCash(buyerCashId, totalBuyPrice, custodian, sellOffer.seller, timestamp)
+     transferShares(sellerSharesId, buyOffer.amount, custodian, buyOffer.buyer, timestamp)
+     updateOffers((fromSome buyOfferCid), (fromSome sellOfferCid), buyOffer.amount, timestamp)
+     return ()     
+
+template Trader
+ with
+  custodian: Party
+  trader:    Party
+ where
+  signatory custodian
+  observer trader
+
+  key (custodian, trader): (Party, Party)
+  maintainer key._1
+
+  nonconsuming choice TraderCashRequest: ContractId CashRequest
+   with amount: Decimal; currency: Text
+   controller trader
+   do
+    assertMsg "Cannot request less than zero cash." (amount > 0.0) 
+    create CashRequest with custodian; requester = trader; amount; currency
+   
+  nonconsuming choice TraderOfferBuy: ContractId BuyOffer
+   with pricePerShare: Decimal; corp: Text; amount: Decimal; currency: Text; timestamp: Int
+   controller trader
+   do
+    let cashId = createUniqueIdentifier [(partyToText custodian), (partyToText trader), currency, (show AVAI)]
+    cashCid <- lookupByKey @Cash (custodian, cashId)
+    case cashCid of
+     None -> do abort "Cash not found"
+     Some cashCid -> do
+      exercise cashCid ChangeCashState with changeAmount = (pricePerShare * amount); newState = LOCKED; timestamp
+       
+      let offerId = createUniqueIdentifier [(partyToText custodian), (partyToText trader), corp, currency]
+      create BuyOffer with custodian; pricePerShare; buyer = trader; corp; amount; currency; id = offerId; latestUpdateTimestamp = timestamp
+  
+  nonconsuming choice TraderOfferSell: ContractId SellOffer
+     with corp: Text; amount: Decimal; pricePerShare: Decimal; currency: Text; timestamp: Int
+     controller trader
+     do
+      let sharesId = createUniqueIdentifier [(partyToText custodian), (partyToText trader), corp, (show AVAI)]
+      shareCid <- lookupByKey @Shares (custodian, sharesId)
+      case shareCid of
+       None -> do abort "Shares not found"
+       Some shareCid -> do
+        exercise shareCid ChangeShareState with changeAmount = amount; newState = LOCKED; timestamp
+
+        let sellOfferId = createUniqueIdentifier [(partyToText custodian), (partyToText trader), corp, currency]
+        create SellOffer with custodian; amount = amount; corp; pricePerShare; seller = trader; currency; id = sellOfferId; latestUpdateTimestamp = timestamp
+
+template Corporation
+ with
+  custodian:   Party
+  corporation: Party
+ where
+  signatory custodian
+  observer corporation
+
+  key (custodian, corporation): (Party, Party)
+  maintainer key._1
+
+  nonconsuming choice CorpOfferSell: ContractId SellOffer
+   with corp: Text; amount: Decimal; pricePerShare: Decimal; currency: Text; timestamp: Int
+   controller corporation
+   do
+    let sharesId = createUniqueIdentifier [(partyToText custodian), (partyToText corporation), corp, (show AVAI)]
+    shareCid <- lookupByKey @Shares (custodian, sharesId)
+    case shareCid of
+     None -> do abort "Shares not found"
+     Some shareCid -> do
+      exercise shareCid ChangeShareState with changeAmount = amount; newState = LOCKED; timestamp
+
+      let sellOfferId = createUniqueIdentifier [(partyToText custodian), (partyToText corporation), corp, currency]
+      create SellOffer with custodian; amount = amount; corp; pricePerShare; seller = corporation; currency; id = sellOfferId; latestUpdateTimestamp = timestamp
+  
+  nonconsuming choice CorpOfferBuy: ContractId BuyOffer
+   with pricePerShare: Decimal; corp: Text; amount: Decimal; currency: Text; timestamp: Int
+   controller corporation
+   do
+    let cashId = createUniqueIdentifier [(partyToText custodian), (partyToText corporation), currency, (show AVAI)]
+    cashCid <- lookupByKey @Cash (custodian, cashId)
+    case cashCid of
+     None -> do abort "Cash not found"
+     Some cashCid -> do
+      exercise cashCid ChangeCashState with changeAmount = amount; newState = LOCKED; timestamp
+
+      let buyOfferId = createUniqueIdentifier [(partyToText custodian), (partyToText corporation), corp, currency]
+      create BuyOffer with custodian; pricePerShare; buyer = corporation; corp; amount; currency; id = buyOfferId; latestUpdateTimestamp = timestamp
+
+  nonconsuming choice CorporationCashRequest: ContractId CashRequest
+   with amount: Decimal; currency: Text
+   controller corporation
+   do
+    assertMsg "Cannot request less than zero cash." (amount > 0.0) 
+    create CashRequest with custodian; requester = corporation; amount; currency
+   
+  nonconsuming choice CreateShareRequest: ContractId ShareRequest
+   with amount: Decimal
+   controller corporation
+   do
+    assertMsg "Cannot request less than zero shares." (amount > 0.0) 
+    create ShareRequest with custodian; requester = corporation; amount

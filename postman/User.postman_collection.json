@@ -1,0 +1,102 @@
+{
+	"info": {
+		"_postman_id": "7da285bb-5cc4-4a1f-bf79-bb212ea26a1d",
+		"name": "User",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ad8367a5-10a1-4b7b-b088-1d7417830875",
+						"exec": [
+							"const environmentToken = \"token\"; // the name of the environment variable",
+							"const newToken = pm.response.json().token;",
+							"",
+							"// verify that we have a token value",
+							"pm.test(\"access token value should be present\", function() {",
+							"  pm.expect(newToken.length > 0);",
+							"});",
+							"",
+							"// save the new token in our environment variable",
+							"pm.environment.set(environmentToken, newToken);",
+							"",
+							"// simple verification that the value was saved as intended",
+							"pm.test(\"Token environment variable should be updated\", function() {",
+							"  const checkToken = pm.environment.get(environmentToken);",
+							"  pm.expect(checkToken).to.eql(newToken);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"NASDAQ\",\n\t\"password\": \"password\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "decode-jwt/{{token}}",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8083/decode-jwt/{{token}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"decode-jwt",
+						"{{token}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

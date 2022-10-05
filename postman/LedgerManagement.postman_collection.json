@@ -1,0 +1,262 @@
+{
+	"info": {
+		"_postman_id": "635d130f-1631-487d-a7e0-f28ab3109ac8",
+		"name": "LedgerManagement",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "manualLedgerConnection",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8083/ledger-management/connect",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"ledger-management",
+						"connect"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getLedgerParties",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8083/ledger-management/parties",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"ledger-management",
+						"parties"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getLedgerPartyById",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8083/ledger-management/parties/party-129943bf-c376-4553-8b12-63a13193bb0d::1220b91903ab0b97c47494ad1eaf4555dc7278f68faa1311d46a541a0e304a77cd07",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"ledger-management",
+						"parties",
+						"party-129943bf-c376-4553-8b12-63a13193bb0d::1220b91903ab0b97c47494ad1eaf4555dc7278f68faa1311d46a541a0e304a77cd07"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createLedgerParty",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"identifierHint\": \"testParty\",\n\t\"displayName\": \"testParty\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/ledger-management/parties",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"ledger-management",
+						"parties"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "pruneLedgerByOffset",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8083/ledger-management/prune/exampleOffset",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"ledger-management",
+						"prune",
+						"exampleOffset"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getLedgerPackages",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8083/ledger-management/packages",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"ledger-management",
+						"packages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getLedgerPackageById",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8083/ledger-management/packages/86828b9843465f419db1ef8a8ee741d1eef645df02375ebf509cdc8c3ddd16cb",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"ledger-management",
+						"packages",
+						"86828b9843465f419db1ef8a8ee741d1eef645df02375ebf509cdc8c3ddd16cb"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "uploadLedgerPackage",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/octet-stream",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {}
+				},
+				"url": {
+					"raw": "http://localhost:8083/ledger-management/packages",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"ledger-management",
+						"packages"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

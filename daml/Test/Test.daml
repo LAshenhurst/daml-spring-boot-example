@@ -1,0 +1,52 @@
+module Test.Test where
+
+import Daml.Script
+import DA.Optional
+
+import Main.Assets
+import Main.Entities
+
+registerParties = script do
+ nasdaq <- allocateParty "NASDAQ"
+ goog <- allocateParty "Google"
+ alice <- allocateParty "Alice"
+
+ custContract <- submit nasdaq do createCmd Custodian with custodian = nasdaq
+
+ googRelationship <- submit nasdaq do exerciseCmd custContract RegisterCorporation with corporation = goog 
+ aliceRelationship <- submit nasdaq do exerciseCmd custContract RegisterTrader with trader = alice
+
+ return (nasdaq, alice, goog, custContract, googRelationship, aliceRelationship)
+
+registerCash = script do
+ (nasdaq, alice, goog, custContract, googRelationship, aliceRelationship) <- registerParties
+
+ aliceCashRequest <- submit alice do exerciseCmd aliceRelationship TraderCashRequest with amount = 55.0; currency = "USD"
+ aliceCash <- submit nasdaq do exerciseCmd aliceCashRequest CreateCash with timestamp = 1
+
+ return (nasdaq, alice, goog, custContract, googRelationship, aliceRelationship, aliceCash)
+
+registerShares = script do
+ (nasdaq, alice, goog, custContract, googRelationship, aliceRelationship, aliceCash) <- registerCash
+
+ googSharesRequest <- submit goog do exerciseCmd googRelationship CreateShareRequest with amount = 55.0
+ googShares <- submit nasdaq do exerciseCmd googSharesRequest CreateShares with timestamp = 2
+
+ return (nasdaq, alice, goog, custContract, googRelationship, aliceRelationship, aliceCash, googShares)
+
+createOffers = script do
+ (nasdaq, alice, goog, custContract, googRelationship, aliceRelationship, aliceCash, googShares) <- registerShares
+
+ submit goog do exerciseCmd googRelationship CorpOfferSell with corp = (partyToText goog); amount = 50.0; pricePerShare = 1.0; currency = "USD"; timestamp = 3
+ submit alice do exerciseCmd aliceRelationship TraderOfferBuy with pricePerShare = 1.0; corp = (partyToText goog); amount = 5.0; currency = "USD"; timestamp = 4
+
+basicTest = script do
+ (nasdaq, alice, goog, custContract, googRelationship, aliceRelationship, aliceCash, googShares) <- registerShares
+
+ googSellOfferCid <- submit goog do exerciseCmd googRelationship CorpOfferSell with corp = (partyToText goog); amount = 50.0; pricePerShare = 1.0; currency = "USD"; timestamp = 3
+ aliceBuyOfferCid <- submit alice do exerciseCmd aliceRelationship TraderOfferBuy with pricePerShare = 1.0; corp = (partyToText goog); amount = 50.0; currency = "USD"; timestamp = 4
+
+ googSellOffer <- queryContractId goog googSellOfferCid
+ aliceBuyOffer <- queryContractId alice aliceBuyOfferCid
+
+ submit nasdaq do exerciseCmd custContract Match with sellId = (fromSome googSellOffer).id; buyId = (fromSome aliceBuyOffer).id; timestamp = 5

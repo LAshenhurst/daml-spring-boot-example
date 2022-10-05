@@ -1,0 +1,236 @@
+{
+	"info": {
+		"_postman_id": "b982b48f-7eac-4827-8f8c-3115516a2956",
+		"name": "Share",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "accept-request",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"requester\": \"Google\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/share/accept-request",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"share",
+						"accept-request"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "decline-request",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"requester\": \"Google\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/share/decline-request",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"share",
+						"decline-request"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"shareOwner\": \"Google\",\n\t\"corp\": \"Google\",\n\t\"reason\": \"Postman example share revoke\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/share/delete",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"share",
+						"delete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "unlock",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"shareOwner\": \"Google\",\n\t\"corp\": \"Google\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/share/unlock",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"share",
+						"unlock"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "filters",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n\t\"filterModel\": {\n\t\t\"owner\": {\n\t\t\t\"filterType\": \"text\",\n\t\t\t\"type\": \"equals\",\n\t\t\t\"filter\": \"Google\"\n\t\t}\n\t}\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/shares/filters",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"shares",
+						"filters"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "share/{id}",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8083/shares/5285401f442975788651809d7f3b3418837d315a00f549b7c4b57521c237d3a7",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"shares",
+						"5285401f442975788651809d7f3b3418837d315a00f549b7c4b57521c237d3a7"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "requests/filters",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n\t\"filterModel\": {\n\t\t\"requester\": {\n\t\t\t\"filterType\": \"text\",\n\t\t\t\"type\": \"equals\",\n\t\t\t\"filter\": \"Google\"\n\t\t}\n\t}\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/shares/requests/filters",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"shares",
+						"requests",
+						"filters"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -1,0 +1,8 @@
+module Main.Utils where
+
+import DA.Text
+
+data AssetState = AVAI | LOCKED | REVOKED deriving(Eq, Show, Ord)
+
+createUniqueIdentifier: [Text] -> Text
+createUniqueIdentifier fields  = (sha256 . implode) fields

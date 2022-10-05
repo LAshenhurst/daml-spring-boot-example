@@ -1,0 +1,129 @@
+{
+	"info": {
+		"_postman_id": "1ce9db61-e586-420f-abeb-a41c9c71c13c",
+		"name": "Corporation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "cash-request",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"value\": 100.0\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/corporation/cash-request",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"corporation",
+						"cash-request"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "share-request",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"value\": 100.0\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/corporation/share-request",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"corporation",
+						"share-request"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "buy-offer",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"pricePerShare\": 10.0,\n\t\"corp\": \"Google\",\n\t\"amount\": 50\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/corporation/buy-offer",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"corporation",
+						"buy-offer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "sell-offer",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"pricePerShare\": 10.0,\n\t\"corp\": \"Google\",\n\t\"amount\": 50\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8083/corporation/sell-offer",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"corporation",
+						"sell-offer"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
